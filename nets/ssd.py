@@ -40,7 +40,7 @@ def add_extras(i, backbone_namne):
     return layers
 
 
-def get_ssd(phase, num_class, backbone_name, confidence=0.5, nms_iou=0.45):
+def get_ssd(phase, num_classes, backbone_name, confidence=0.5, nms_iou=0.45):
     '''
 
     :param phase: training or test
@@ -74,7 +74,7 @@ def get_ssd(phase, num_class, backbone_name, confidence=0.5, nms_iou=0.45):
             # 上面mbox[k]*4的含义是：一共有mbox[k]个框，每个先验框需要四个维度，即x,y,w,h
 
             conf_layers += [nn.Conv2d(backbone[v].out_channels,
-                                      mbox[k] * num_class, kernel_size=3, padding=1)]
+                                      mbox[k] * num_classes, kernel_size=3, padding=1)]
 
         # -------------------------------------------------------------#
         #   在add_extras获得的特征层里
@@ -82,6 +82,9 @@ def get_ssd(phase, num_class, backbone_name, confidence=0.5, nms_iou=0.45):
         #   shape分别为(10,10,512), (5,5,256), (3,3,256), (1,1,256)
         # -------------------------------------------------------------#
         for k,v in enumerate(extra_layers[1::2],2):
-
+            loc_layers += [nn.Conv2d(v.out_channels, mbox[k]
+                                    * 4, kernel_size=3, padding=1)]
+            conf_layers += [nn.Conv2d(v.out_channels, mbox[k]
+                                    * num_classes, kernel_size=3, padding=1)]
     else:
         pass
