@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from nets.vgg import vgg as add_vgg
 import torch.nn.functional as F
+from utils.config import Config
+import torch.nn.init as init
 
 
 def add_extras(i, backbone_namne):
@@ -81,10 +83,25 @@ def get_ssd(phase, num_classes, backbone_name, confidence=0.5, nms_iou=0.45):
         #   第1层、第3层、第5层、第7层可以用来进行回归预测和分类预测。
         #   shape分别为(10,10,512), (5,5,256), (3,3,256), (1,1,256)
         # -------------------------------------------------------------#
-        for k,v in enumerate(extra_layers[1::2],2):
+        for k, v in enumerate(extra_layers[1::2], 2):
             loc_layers += [nn.Conv2d(v.out_channels, mbox[k]
-                                    * 4, kernel_size=3, padding=1)]
+                                     * 4, kernel_size=3, padding=1)]
             conf_layers += [nn.Conv2d(v.out_channels, mbox[k]
-                                    * num_classes, kernel_size=3, padding=1)]
+                                      * num_classes, kernel_size=3, padding=1)]
     else:
         pass
+
+
+
+
+
+
+class SSD(nn.Module):
+    def __init__(self, phase, base, extras, head, num_classes, confidnece, nms_iou, backbone_name):
+        super(SSD, self).__init__()
+        self.phase = phase
+        self.num_classes = num_classes
+        self.cfg = Config
+        if backbone_name == 'vgg':
+            self.vgg = nn.ModuleList(base)
+            self.L2Norm = L2Norm
