@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 from nets.vgg import vgg as add_vgg
 import torch.nn.functional as F
-from utils.config import Config
-import torch.nn.init as init
+# from utils.config import Config
+from ssd_layer import L2Norm
 
 
 def add_extras(i, backbone_namne):
@@ -92,16 +92,97 @@ def get_ssd(phase, num_classes, backbone_name, confidence=0.5, nms_iou=0.45):
         pass
 
 
-
-
-
-
 class SSD(nn.Module):
-    def __init__(self, phase, base, extras, head, num_classes, confidnece, nms_iou, backbone_name):
+    def __init__(self, phase, base, extras, head, num_classes, confidence, nms_iou, backbone_name):
         super(SSD, self).__init__()
         self.phase = phase
         self.num_classes = num_classes
-        self.cfg = Config
+        self.confidence = confidence
+        self.nms_iou = nms_iou
+        self.backbone_name = backbone_name
+
+        # self.cfg = Config
         if backbone_name == 'vgg':
             self.vgg = nn.ModuleList(base)
-            self.L2Norm = L2Norm
+            self.L2Norm = L2Norm(512, 20)
+        else:
+            pass
+        self.extras = nn.ModuleList(extras)
+        # 未完成
+
+    def forward(self):
+        # 将backbone与extras连接起来
+        sources = list()
+        loc = list()
+        conf = list()
+
+        # ---------------------------#
+        #   获得conv4_3的内容
+        #   shape为38,38,512
+        # ---------------------------#
+        if self.backbone_name == 'vgg':
+            for k in range(23):
+                x = self.vgg[k](x)
+        else:
+            pass
+        # ---------------------------#
+        #   conv4_3的内容
+        #   需要进行L2标准化
+        # ---------------------------#
+        sources.append(self.L2Norm(x))
+
+        # ---------------------------#
+        #   获得conv7的内容
+        #   shape为19,19,1024
+        # ---------------------------#
+        if self.backbone_name == 'vgg':
+            for k in range(23, len(self.vgg)):
+                x = self.vgg[k](x)
+            else:
+                pass
+        sources.append(x)
+
+        # -------------------------------------------------------------#
+        #   在add_extras获得的特征层里
+        #   第1层、第3层、第5层、第7层可以用来进行回归预测和分类预测。
+        #   shape分别为(10,10,512), (5,5,256), (3,3,256), (1,1,256)
+        # -------------------------------------------------------------#
+        for k, v in enumerate(self.extras):
+            x = F.relu(v(x), inplace=True)
+            if self.backbone_name == "vgg":
+                if k % 2 == 1:
+                    sources.append(x)
+            else:
+                pass
+
+        # -------------------------------------------------------------#
+        #   为获得的6个有效特征层添加回归预测和分类预测
+        # -------------------------------------------------------------#
+        for (x, l, c) in zip(sources, self.loc, self.conf):
+            loc.append(l(x).permute(0, 2, 3, 1).contiguous())
+            conf.append(c(x).permute(0, 2, 3, 1).contiguous())
+
+        # -------------------------------------------------------------#
+        #   进行reshape方便堆叠
+        # -------------------------------------------------------------#
+        loc = torch.cat([o.view(o.size(0), -1) for o in loc], 1)
+        conf = torch.cat([o.view(o.size(0), -1) for o in conf], 1)
+        # -------------------------------------------------------------#
+        #   loc会reshape到batch_size,num_anchors,4
+        #   conf会reshap到batch_size,num_anchors,self.num_classes
+        #   如果用于预测的话，会添加上detect用于对先验框解码，获得预测结果
+        #   不用于预测的话，直接返回网络的回归预测结果和分类预测结果用于训练
+        # -------------------------------------------------------------#
+        if self.phase == "test":
+            output = self.detect(
+                loc.view(loc.size(0), -1, 4),
+                self.softmax(conf.view(conf.size(0), -1, self.num_classes)),
+                self.priors
+            )
+        else:
+            output = (
+                loc.view(loc.size(0), -1, 4),
+                conf.view(conf.size(0), -1, self.num_classes),
+                self.priors
+            )
+        return output
