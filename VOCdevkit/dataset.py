@@ -98,7 +98,7 @@ rootdir = '../'
 
 
 def convertimgset(img_set):
-    imgdir = rootdir + 'VOCdevkit/VOC2007/WIDER_' + img_set + '/images'
+    imgdir = rootdir + 'VOCdevkit/WIDER_' + img_set + '/images'
     gtfilepath = rootdir + 'VOCdevkit/wider_face_split/wider_face_' + img_set + '_bbx_gt.txt'
 
     fwrite = open(rootdir + 'VOCdevkit/VOC2007/ImageSets/Main/' + img_set + ".txt", 'w')
