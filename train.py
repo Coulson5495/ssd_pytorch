@@ -172,7 +172,7 @@ if __name__ == "__main__":
         cudnn.benchmark = True
         net = net.cuda()
 
-    # ------------------------------------------------------#
+    # ---------------------------------------------------#
     #   主干特征提取网络特征通用，冻结训练可以加快训练速度
     #   也可以在训练初期防止权值被破坏。
     #   Init_Epoch为起始世代
@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
     if True:
         lr = 1e-4
-        Batch_size = 16
+        Batch_size = 128
         Freeze_Epoch = 50
         Unfreeze_Epoch = 100
 
