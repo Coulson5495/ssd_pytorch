@@ -98,10 +98,10 @@ rootdir = '../'
 
 
 def convertimgset(img_set):
-    imgdir = rootdir + 'data/WIDER_' + img_set + '/images'
-    gtfilepath = rootdir + 'data/wider_face_split/wider_face_' + img_set + '_bbx_gt.txt'
+    imgdir = rootdir + 'VOCdevkit/VOC2007/WIDER_' + img_set + '/images'
+    gtfilepath = rootdir + 'VOCdevkit/wider_face_split/wider_face_' + img_set + '_bbx_gt.txt'
 
-    fwrite = open(rootdir + 'data/ImageSets/Main/' + img_set + ".txt", 'w')
+    fwrite = open(rootdir + 'VOCdevkit/VOC2007/ImageSets/Main/' + img_set + ".txt", 'w')
 
     index = 0
 
@@ -160,9 +160,9 @@ def convertimgset(img_set):
             else: # bboxes里有锚框
                 # cv2.imshow("img", img)
                 # cv2.waitKey(0)
-                cv2.imwrite("{}data/JPEGImages/{}".format(rootdir, filename), img)
+                cv2.imwrite("{}VOCdevkit/VOC2007/JPEGImages/{}".format(rootdir, filename), img)
                 fwrite.write(filename.split(".")[0] + "\n")
-                xmlpath = "{}data/Annotations/{}.xml".format(rootdir, filename.split(".")[0])
+                xmlpath = "{}VOCdevkit/VOC2007/Annotations/{}.xml".format(rootdir, filename.split(".")[0])
                 writexml(filename, img, bboxes, xmlpath)
 
                 print("success number is ", index)
@@ -178,5 +178,6 @@ if __name__ == "__main__":
         convertimgset(img_set)
 
     # 移动文件，train->trainval, val->test
-    shutil.move(rootdir + "data/ImageSets/Main/" + "train.txt", rootdir + "data/ImageSets/Main/" + "trainval.txt")
-    shutil.move(rootdir + "data/ImageSets/Main/" + "val.txt", rootdir + "data/ImageSets/Main/" + "test.txt")
+    # trainval存放用于训练验证的文件名，test存放用于测试的文件名
+    shutil.move(rootdir + "VOCdevkit/VOC2007/ImageSets/Main/" + "train.txt", rootdir + "VOCdevkit/VOC2007/ImageSets/Main/" + "trainval.txt")
+    shutil.move(rootdir + "VOCdevkit/VOC2007/ImageSets/Main/" + "val.txt", rootdir + "VOCdevkit/VOC2007/ImageSets/Main/" + "test.txt")

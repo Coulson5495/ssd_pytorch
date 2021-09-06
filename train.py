@@ -138,15 +138,15 @@ if __name__ == "__main__":
     # ------------------------------------------------------#
     #   权值文件请看README，百度网盘下载
     # ------------------------------------------------------#
-    model_path = "model_data/ssd_weights.pth"
-    print('Loading weights into state dict...')
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model_dict = model.state_dict()
-    pretrained_dict = torch.load(model_path, map_location=device)
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if np.shape(model_dict[k]) == np.shape(v)}
-    model_dict.update(pretrained_dict)
-    model.load_state_dict(model_dict)
-    print('Finished!')
+    # model_path = "model_data/ssd_weights.pth"
+    # print('Loading weights into state dict...')
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # model_dict = model.state_dict()
+    # pretrained_dict = torch.load(model_path, map_location=device)
+    # pretrained_dict = {k: v for k, v in pretrained_dict.items() if np.shape(model_dict[k]) == np.shape(v)}
+    # model_dict.update(pretrained_dict)
+    # model.load_state_dict(model_dict)
+    # print('Finished!')
 
     annotation_path = '2007_train.txt'
     # ----------------------------------------------------------------------#
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     # ------------------------------------------------------#
     if True:
         lr = 5e-4
-        Batch_size = 32
+        Batch_size = 128
         Init_Epoch = 0
         Freeze_Epoch = 50
 
@@ -192,9 +192,9 @@ if __name__ == "__main__":
         train_dataset = SSDDataset(lines[:num_train], (Config["min_dim"], Config["min_dim"]), True)
         val_dataset = SSDDataset(lines[num_train:], (Config["min_dim"], Config["min_dim"]), False)
 
-        gen = DataLoader(train_dataset, shuffle=True, batch_size=Batch_size, num_workers=4, pin_memory=True,
+        gen = DataLoader(train_dataset, shuffle=True, batch_size=Batch_size, num_workers=0, pin_memory=True,
                          drop_last=True, collate_fn=ssd_dataset_collate)
-        gen_val = DataLoader(val_dataset, shuffle=True, batch_size=Batch_size, num_workers=4, pin_memory=True,
+        gen_val = DataLoader(val_dataset, shuffle=True, batch_size=Batch_size, num_workers=0, pin_memory=True,
                              drop_last=True, collate_fn=ssd_dataset_collate)
 
         if backbone == "vgg":
@@ -227,9 +227,9 @@ if __name__ == "__main__":
         train_dataset = SSDDataset(lines[:num_train], (Config["min_dim"], Config["min_dim"]), True)
         val_dataset = SSDDataset(lines[num_train:], (Config["min_dim"], Config["min_dim"]), False)
 
-        gen = DataLoader(train_dataset, shuffle=True, batch_size=Batch_size, num_workers=4, pin_memory=True,
+        gen = DataLoader(train_dataset, shuffle=True, batch_size=Batch_size, num_workers=0, pin_memory=True,
                          drop_last=True, collate_fn=ssd_dataset_collate)
-        gen_val = DataLoader(val_dataset, shuffle=True, batch_size=Batch_size, num_workers=4, pin_memory=True,
+        gen_val = DataLoader(val_dataset, shuffle=True, batch_size=Batch_size, num_workers=0, pin_memory=True,
                              drop_last=True, collate_fn=ssd_dataset_collate)
 
         if backbone == "vgg":

@@ -10,7 +10,7 @@ sets=[('2007', 'train'), ('2007', 'val'), ('2007', 'test')]
 #-----------------------------------------------------#
 #   这里设定的classes顺序要和model_data里的txt一样
 #-----------------------------------------------------#
-classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
+classes =['face']
 
 def convert_annotation(year, image_id, list_file):
     in_file = open('VOCdevkit/VOC%s/Annotations/%s.xml'%(year, image_id), encoding='utf-8')

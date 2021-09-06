@@ -75,17 +75,18 @@ img/street.jpg
 1. 本文使用VOC格式进行训练。  
 2. 训练前将标签文件放在VOCdevkit文件夹下的VOC2007文件夹下的Annotation中。  
 3. 训练前将图片文件放在VOCdevkit文件夹下的VOC2007文件夹下的JPEGImages中。  
-4. 在训练前使用VOCdekvit下的dataset将txt文件转化为xml
-5. 在训练前利用voc2ssd.py文件生成对应的txt。  
-6. 再运行根目录下的voc_annotation.py，运行前需要将classes改成你自己的classes。**注意不要使用中文标签，文件夹中不要有空格！**   
+4. 在训练前利用voc2ssd.py文件生成对应的txt。  
+5. 再运行根目录下的voc_annotation.py，运行前需要将classes改成你自己的classes。**注意不要使用中文标签，文件夹中不要有空格！**   
 ```python
-classes = ['face']
+classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 ```
 6. 此时会生成对应的2007_train.txt，每一行对应其**图片位置**及其**真实框的位置**。  
 7. **在训练前需要务必在model_data下新建一个txt文档，文档中输入需要分的类**，示例如下：   
 model_data/new_classes.txt文件内容为：   
 ```python
-face
+cat
+dog
+...
 ```
 8. 将utils.config的num_classes修改成所需要分的类的个数+1，运行train.py即可开始训练。
 
